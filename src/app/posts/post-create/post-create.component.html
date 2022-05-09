@@ -1,0 +1,11 @@
+<mat-card>
+    <mat-form-field>
+        <input matInput type="text" [(ngModel)]="enteredTitle">
+    </mat-form-field>
+    <mat-form-field>
+        <!-- con # añade una referencia al campo  y seria un elemento del dom, con .value podriamos obtener su valor-->
+        <textarea matInput rows="6" [value]="newPost"
+         [(ngModel)]="enteredContent"></textarea>
+        </mat-form-field>
+        <button mat-raised-button color="primary" (click)="onAddPost()">Save posts</button>
+</mat-card>
