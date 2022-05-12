@@ -1,5 +1,6 @@
 import { ThisReceiver } from '@angular/compiler';
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Post } from 'src/app/shared/models/post.model';
 
 @Component({
@@ -18,8 +19,11 @@ export class PostCreateComponent implements OnInit {
   ngOnInit(): void {
   }
   // si hubiesemos añadido una referencia en el html con # la podemos recoger asi postInput : HTMLTextAreaElement
-  onAddPost(){
-    const post : Post = { title: this.enteredTitle, content: this.enteredContent};
+  onAddPost(form : NgForm){
+    if(form.invalid){
+      return;
+    }
+    const post : Post = { title: form.value.title, content: form.value.content};
     this.postCreated.emit(post);
   }
 

@@ -1,11 +1,27 @@
 <mat-card>
+    <!-- con (submit) escuchas el evento -->
+    <!-- el value despues del # debe ser ngForm -->
+  <form (submit)="onAddPost(postForm)" #postForm="ngForm">
     <mat-form-field>
-        <input matInput type="text" [(ngModel)]="enteredTitle">
+        <!-- solo ngModel, con un name, registra el input como formcontrol -->
+      <input matInput type="text" name="title" ngModel required #title="ngModel"/>
+      <mat-error *ngIf="title.invalid">Please enter a post title</mat-error>
     </mat-form-field>
     <mat-form-field>
-        <!-- con # añade una referencia al campo  y seria un elemento del dom, con .value podriamos obtener su valor-->
-        <textarea matInput rows="6" [value]="newPost"
-         [(ngModel)]="enteredContent"></textarea>
-        </mat-form-field>
-        <button mat-raised-button color="primary" (click)="onAddPost()">Save posts</button>
+      <!-- con # añade una referencia al campo  y seria un elemento del dom, con .value podriamos obtener su valor-->
+      <textarea
+        matInput
+        rows="6"
+        [value]="newPost"
+        name="content"
+        ngModel
+        required
+        #content="ngModel"
+      ></textarea>
+      <mat-error *ngIf="content.invalid">Please enter a post content</mat-error>
+    </mat-form-field>
+    <button mat-raised-button color="primary" type="submit">
+      Save posts
+    </button>
+  </form>
 </mat-card>
