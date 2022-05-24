@@ -4,7 +4,7 @@
   <form (submit)="onAddPost(postForm)" #postForm="ngForm">
     <mat-form-field>
         <!-- solo ngModel, con un name, registra el input como formcontrol -->
-      <input matInput type="text" name="title" ngModel required #title="ngModel"/>
+      <input matInput type="text" name="title" ngModel required minlength="3" placeholder="Post Title" #title="ngModel"/>
       <mat-error *ngIf="title.invalid">Please enter a post title</mat-error>
     </mat-form-field>
     <mat-form-field>
@@ -16,6 +16,7 @@
         name="content"
         ngModel
         required
+        placeholder="Post Content"
         #content="ngModel"
       ></textarea>
       <mat-error *ngIf="content.invalid">Please enter a post content</mat-error>
