@@ -17,10 +17,11 @@ export class PostListComponent implements OnInit, OnDestroy {
   // {title: 'Third post', content: "Third post content"}];
   posts: Post[] = [];
   private postsSub!: Subscription;
-
+  isLoading = false;
   constructor(public postsService : PostsService) { }
 
   ngOnInit(): void {
+    this.isLoading = true;
     //subscribe recibe una funcion que a su vez
     //recibe tres argumentos(que seran tres funciones) cuando se emite un dato, cuando hay un error
     // y cuando no espera mas valores
@@ -28,9 +29,14 @@ export class PostListComponent implements OnInit, OnDestroy {
     //guardamos la subscription en una variable para que no siga viva
     //cuando el componente no sea parte del DOM
     this.postsSub =  this.postsService.getPostUpdateListener()
-    .subscribe((posts : Post[]) => {
-      this.posts = posts;
+    .subscribe((respuesta ) => {
+      this.isLoading = false;
+      this.posts = respuesta;
     });
+  }
+
+  onDelete(postid : string){
+    this.postsService.deletePost(postid);
   }
   ngOnDestroy(): void {
     //para prevenir fugas de memoria(memory leaks)
