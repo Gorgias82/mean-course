@@ -72,14 +72,35 @@ router.put("/:id", multer({storage: storage}).single("image"), (req, res, next) 
 });
 
 router.get('',(req, res, next) => {
-    console.log("prueba");
+  //el + delante los castea a numbers
+    const pageSize = +req.query.pagesize;
+    const currentPage = +req.query.page;
+    //aque no se ejecuta el find solo se almacena en la constante
+    const postQuery = Post.find();
+    let fetchedPosts;
+    if(pageSize && currentPage){
+      //no saca el numero que se le indica, se los salta
+      // y limita la busqueda al tamaño de la pagina
+      postQuery
+      .skip(pageSize * (currentPage - 1))
+      .limit(pageSize);
+    }
     //devuelve todos los posts si no se le pasan mas datos
     //se puede pasar una funcion arrow como callback
     //tambien podemos usar el metodo then
-    Post.find()
+    postQuery
     .then(documents => {
-      console.log(documents);
-      res.status(200).json({message : "Consulta correcta", posts: documents});
+      //no se podria acceder en el segundo then a la primera consulta
+      // asique se almacena en una variable
+      fetchedPosts = documents;
+      return Post.count();
+    })
+    .then(count => {
+      res.status(200).json({
+        message : "Posts fetched successfully!",
+        posts: fetchedPosts,
+        maxPosts : count
+      });
     });
     
 });

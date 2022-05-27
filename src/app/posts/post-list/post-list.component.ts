@@ -1,7 +1,8 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Post } from 'src/app/shared/models/post.model';
 import { PostsService } from '../posts.service';
-import { Subscription } from 'rxjs';
+import { subscribeOn, Subscription } from 'rxjs';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-post-list',
@@ -18,6 +19,10 @@ export class PostListComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
   private postsSub!: Subscription;
   isLoading = false;
+  totalPosts : number = 0;
+  postsPerPage : number = 2;
+  currentPage : number = 1;
+  pageSizeOptions : number[] = [1,2,5, 10];
   constructor(public postsService : PostsService) { }
 
   ngOnInit(): void {
@@ -25,18 +30,27 @@ export class PostListComponent implements OnInit, OnDestroy {
     //subscribe recibe una funcion que a su vez
     //recibe tres argumentos(que seran tres funciones) cuando se emite un dato, cuando hay un error
     // y cuando no espera mas valores
-    this.postsService.getPosts();
+    this.postsService.getPosts(this.postsPerPage, this.currentPage);
     //guardamos la subscription en una variable para que no siga viva
     //cuando el componente no sea parte del DOM
     this.postsSub =  this.postsService.getPostUpdateListener()
-    .subscribe((respuesta ) => {
+    .subscribe((postData : {posts: Post[], postCount: number } ) => {
       this.isLoading = false;
-      this.posts = respuesta;
+      this.totalPosts = postData.postCount;
+      this.posts = postData.posts;
     });
+  }
+  onChangedPage(pagedata : PageEvent){
+    this.currentPage = pagedata.pageIndex +1;
+    this.postsPerPage = pagedata.pageSize;
+    this.postsService.getPosts(this.postsPerPage, this.currentPage);
   }
 
   onDelete(postid : string){
-    this.postsService.deletePost(postid);
+    this.isLoading = true;
+    this.postsService.deletePost(postid).subscribe(() =>{
+      this.postsService.getPosts(this.postsPerPage, this.currentPage);
+    });
   }
   ngOnDestroy(): void {
     //para prevenir fugas de memoria(memory leaks)
