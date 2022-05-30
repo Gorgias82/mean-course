@@ -30,6 +30,9 @@ router.post("/signup", (req, res, next) => {
 });
 
 router.post("/login", (req, res, next) => {
+    //usamos una variable declarada fuera de los bloques
+    //then para pasar variables entre ellos
+    let fetchedUser;
 User.findOne({ email: req.body.email })
 .then(user => {
     if(!user){
@@ -37,6 +40,7 @@ User.findOne({ email: req.body.email })
             message: "Auth failed"
         });
     }
+    fetchedUser = user
     return bcrypt.compare(req.body.password, user.password);
 })
 .then(result => {
@@ -47,7 +51,11 @@ User.findOne({ email: req.body.email })
     }
     //le pasamos tres argumentos, el payload con el contenido
     //un string que es como el salt, y opciones(en este caso la caducidad)
-    const token = jwt.sign({email: user.email, userId : user._id}, 'secret_this_should_be_longer', {expiresIn: '1h'});
+    const token = jwt.sign({email: fetchedUser.email, userId : fetchedUser._id}, 'secret_this_should_be_longer', {expiresIn: '1h'});
+    res.status(200).json({
+        token: token,
+        expiresIn: "3600"
+    })
 
 })
 .catch(err => {
