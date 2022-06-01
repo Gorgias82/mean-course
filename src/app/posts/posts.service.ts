@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -25,13 +26,16 @@ export class PostsService {
 
     //http.get o post devuelve un Observable, al cual nos subscribimos
     this.http.get<{message:string; posts : any, maxPosts: number}>('http://localhost:3000/api/posts' + queryParams)
+    //añade el count de los posts con una pipe
+    //y modificando el array de posts con el metodo map
     .pipe(map((postData) => {
       return { posts:  postData.posts.map(post => {
         return{
           title: post.title,        
           content: post.content,
           id: post._id,
-          imagePath : post.imagePath
+          imagePath : post.imagePath,
+          creator: post.creator
         }
       }), maxPosts : postData.maxPosts
     };

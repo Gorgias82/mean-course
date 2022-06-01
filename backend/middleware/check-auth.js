@@ -14,7 +14,13 @@ module.exports = (req, res, next) => {
         //que es como el salt que usamos en user al crear el token
         //si no es correcto saltara un error asi que pasara al bloque
         //de catch
-        jwt.verify(token, "secret_this_should_be_longer");
+        //devuelve el token descodificado
+        const decodedToken = jwt.verify(token, "secret_this_should_be_longer");
+        //usamos el token descodificado para extrar el email y el id de usuario
+        // y ponerlo en un nuevo request, como el checkAuth se pone previo al middleware
+        //donde se insertan posts lo podremos recoger alli para asociar el usuario
+        //al nuevo post
+        req.userData = {email: decodedToken.email, userId: decodedToken.userId}
         //si no saltado error pasa al siguiente middleware
         next();
     }catch(error){

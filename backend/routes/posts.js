@@ -35,12 +35,13 @@ router.post("",checkAuth, multer({storage: storage}).single("image") ,(req, res,
     const post = new Post({
       title: req.body.title,
       content: req.body.content,
-      imagePath : url + "/images/" + req.file.filename
+      imagePath : url + "/images/" + req.file.filename,
+      creator: req.userData.userId
     });
+
     //guarda el dato en la base de datos en la collection que es el nombre en plural en este caso posts
     // recogemos el id del post nuevo que se acaba de insertar
     post.save().then(result => {
-      console.log(result);
       res.status(201).json({
         message : 'Post added succesfully',
         post : {
@@ -66,9 +67,17 @@ router.put("/:id",checkAuth, multer({storage: storage}).single("image"), (req, r
     content: req.body.content,
     imagePath : imagePath
   });
-  Post.updateOne({_id : req.params.id}, post).then(result => {
-    console.log(result);
-    res.status(200).json({message : "Update succesful"});
+  //los argumentos que se le pasan al updateOne seran los que use para filtrar
+  //que post se actualiza seria como el where
+  Post.updateOne({_id : req.params.id, creator: req.userData.userId}, post).then(result => {
+    //seria como el affected rows, lo usa para comprobar
+    //que sea el creador del pos quien lo actualiza
+    if(result.nModified  > 0){
+      res.status(200).json({message : "Update succesful"});
+    }else{
+      res.status(401).json({ message: "Not authorized!"});
+    }
+    
   });
 });
 
@@ -119,9 +128,13 @@ router.get("/:id", (req, res, next) => {
 
 
 router.delete("/:id",checkAuth, (req, res , next) => {
-  Post.deleteOne({_id : req.params.id}).then(result => {
-    console.log(result);
-    res.status(200).json({message: 'Post deleted!'});
+  Post.deleteOne({_id : req.params.id, creator:  req.userData.userId}).then(result => {
+    if(result.n  > 0){
+      res.status(200).json({message : "Delete succesful"});
+    }else{
+      res.status(401).json({ message: "Not authorized!"});
+    }
+  
   })
 
 })
