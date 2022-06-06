@@ -24,7 +24,7 @@ module.exports = (req, res, next) => {
         //si no saltado error pasa al siguiente middleware
         next();
     }catch(error){
-        res.status(401).json({message: "Auth failed!"});
+        res.status(401).json({message: "You are not authenticated!"});
     }
     
 };

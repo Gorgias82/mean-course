@@ -12,6 +12,7 @@ export class AuthService {
   private token : string;
   private tokenTimer : number;
   private userId : string;
+  //esto se utilizara para comprobar si el usuario esta logeado
   private authStatusListener = new Subject<boolean>();
   constructor(private http : HttpClient, private router : Router) { }
 
@@ -32,9 +33,13 @@ export class AuthService {
   createUser(email:string, password:string){
     const authData : AuthData = {email:email,password:password};
     this.http.post("http://localhost:3000/api/user/signup", authData)
-      .subscribe(response => {
-        console.log(response);
+      .subscribe(() => {
+        this.router.navigate(['/']);
+      }, error => {
+        //si no se ha podido loguear se actualiza a false para indicar que no esta logeado
+        this.authStatusListener.next(false);
       });
+      
   }
   login(email: string, password:string){
     const authData : AuthData = {email:email,password:password};
@@ -55,6 +60,8 @@ export class AuthService {
             this.router.navigate(['/']);
           }
        
+      }, error => {
+        this.authStatusListener.next(false);
       });
   }
 
@@ -70,6 +77,7 @@ export class AuthService {
         this.isAuthenticated = true;
         this.userId = authInformation.userId;
         this.setAuthTimer(expiresIn / 1000);
+        //se actualiza a true porque se ha logeado correctamente
         this.authStatusListener.next(true);
   
       }
