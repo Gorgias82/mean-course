@@ -1,4 +1,4 @@
-const checkAuth = require("../middleware/check-auth");
+
 const Post = require('../models/post');
 
 
@@ -53,7 +53,7 @@ exports.updatePost =  (req, res, next) => {
     Post.updateOne({_id : req.params.id, creator: req.userData.userId}, post).then(result => {
       //seria como el affected rows, lo usa para comprobar
       //que sea el creador del pos quien lo actualiza
-      if(result.nModified  > 0){
+      if(result.n  > 0){
         res.status(200).json({message : "Update succesful"});
       }else{
         res.status(401).json({ message: "Not authorized!"});
@@ -124,7 +124,7 @@ exports.updatePost =  (req, res, next) => {
     });
   };
 
-  exports.deletePost = checkAuth, (req, res , next) => {
+  exports.deletePost =  (req, res , next) => {
     Post.deleteOne({_id : req.params.id, creator:  req.userData.userId}).then(result => {
       if(result.n  > 0){
         res.status(200).json({message : "Delete succesful"});
